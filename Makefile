@@ -1,27 +1,40 @@
-notebook: The\ Annotated\ Transformer.md
-	jupytext --to ipynb The\ Annotated\ Transformer.md
+notebook: the_annotated_transformer.py
+	jupytext --to ipynb the_annotated_transformer.py
 
-py: The\ Annotated\ Transformer.md
-	jupytext --to py The\ Annotated\ Transformer.md
+py: the_annotated_transformer.ipynb
+	jupytext --to py:percent the_annotated_transformer.ipynb
 
-The\ Annotated\ Transformer.ipynb: The\ Annotated\ Transformer.md
-	jupytext --to ipynb The\ Annotated\ Transformer.md
+the_annotated_transformer.ipynb: the_annotated_transformer.py
+	jupytext --to ipynb the_annotated_transformer.py
 
-execute: The\ Annotated\ Transformer.md
-	jupytext --execute --to ipynb The\ Annotated\ Transformer.md
+execute: the_annotated_transformer.py
+	jupytext --execute --to ipynb the_annotated_transformer.py
 
-html: The\ Annotated\ Transformer.ipynb
-	jupyter nbconvert --to html The\ Annotated\ Transformer.ipynb
+html: the_annotated_transformer.ipynb
+	jupytext --execute --to ipynb the_annotated_transformer.py
+	jupyter nbconvert --to html the_annotated_transformer.ipynb
 
-install-jupytext-pip:
-	pip install jupytext --upgrade
+the_annotated_transformer.md: the_annotated_transformer.ipynb
+	jupyter nbconvert --to markdown  --execute the_annotated_transformer.ipynb
 
-install-jupytext-conda:
-	conda install jupytext -c conda-forge
+blog: the_annotated_transformer.md
+	pandoc docs/header-includes.yaml the_annotated_transformer.md  --katex=/usr/local/lib/node_modules/katex/dist/ --output=docs/index.html --to=html5 --css=docs/github.min.css --css=docs/tufte.css --no-highlight --self-contained --metadata pagetitle="The Annotated Transformer" --resource-path=/home/srush/Projects/annotated-transformer/ --indented-code-classes=nohighlight
 
-flake: The\ Annotated\ Transformer.ipynb
-	jupyter nbconvert The\ Annotated\ Transformer.ipynb --to python
-	flake8 --show-source --ignore "N801, E203, E266, E501, W503, F812, E741, N803, N802, N806, W391" The\ Annotated\ Transformer.py
+
+
+flake: the_annotated_transformer.ipynb
+	flake8 --show-source the_annotated_transformer.py
+
+black: the_annotated_transformer.ipynb
+	black --line-length 79 the_annotated_transformer.py
 
 clean: 
-	rm -f The\ Annotated\ Transformer.py The\ Annotated\ Transformer.ipynb
+	rm -f the_annotated_transformer.ipynb
+
+# see README.md - IWSLT needs to be downloaded manually to obtain 2016-01.tgz
+move-dataset:
+	mkdir -p ~/.torchtext/cache/IWSLT2016
+	cp 2016-01.tgz ~/.torchtext/cache/IWSLT2016/.
+
+setup: move-dataset
+	pip install -r requirements.txt
